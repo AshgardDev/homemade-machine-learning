@@ -1,8 +1,9 @@
 """Neural Network Module"""
 
 import numpy as np
-from ..utils.features import prepare_for_training
-from ..utils.hypothesis import sigmoid, sigmoid_gradient
+
+from homemade.utils.features import prepare_for_training
+from homemade.utils.hypothesis import sigmoid, sigmoid_gradient
 
 
 class MultilayerPerceptron:
@@ -375,3 +376,27 @@ class MultilayerPerceptron:
             unrolled_shift = unrolled_shift + thetas_volume
 
         return thetas
+
+from sklearn.datasets import fetch_openml
+from sklearn.model_selection import train_test_split
+from matplotlib import pyplot as plt
+
+if __name__ == '__main__':
+    print("正在下载 MNIST 数据集...")
+    mnist = fetch_openml('mnist_784', version=1, as_frame=False, parser='auto')
+    print("MNIST 数据集下载完成！")
+
+    X, y = mnist.data, mnist.target
+    print(f"\n数据集形状 (X): {X.shape}")
+    print(f"标签形状 (y): {y.shape}")
+
+    y = y.astype(np.uint8)
+    y = y.reshape((-1, 1))
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.4, random_state=42)
+    nn = MultilayerPerceptron(X_train, y_train, (784, 25, 10), 0.01, normalize_data=True)
+    _, cost_history = nn.train(max_iterations=10, alpha=0.01)
+
+
+    plt.figure()
+    plt.plot(cost_history)
+    plt.show()
